@@ -5,8 +5,14 @@ name = "pypi"
 
 [packages]
 django = "*"
+mysqlclient = "*"
+djangorestframework = "*"
+djoser = "*"
+djangorestframework-simplejwt = "*"
 
 [dev-packages]
+pytest-django = "*"
+django-debug-toolbar = "*"
 
 [requires]
 python_version = "3.13"
