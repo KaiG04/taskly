@@ -22,12 +22,14 @@ class Task(models.Model):
     ]
 
     title = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)
     description = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    category = models.ForeignKey(Category, on_delete=models.PROTECT, null=True, blank=True)
     deadline = models.DateTimeField(null=True, blank=True)
     priority = models.CharField(max_length=1, choices=PRIORITY_CHOICES, default=PRIORITY_NONE)
-    category = models.ForeignKey(Category, on_delete=models.PROTECT, null=True, blank=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+
 
 
 
