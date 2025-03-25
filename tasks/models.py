@@ -9,6 +9,9 @@ class Category(models.Model):
     description = models.TextField(null=True, blank=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.title
+
 class Task(models.Model):
     PRIORITY_NONE = 'N'
     PRIORITY_LOW = 'L'
