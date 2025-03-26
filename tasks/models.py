@@ -32,6 +32,9 @@ class Task(models.Model):
     priority = models.CharField(max_length=1, choices=PRIORITY_CHOICES, default=PRIORITY_NONE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.title
+
 
 
 
