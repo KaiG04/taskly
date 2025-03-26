@@ -20,10 +20,11 @@ class TaskViewSet(ModelViewSet):
 
 
     def get_queryset(self):
-        if self.request.user.is_superuser:
-            return Task.objects.all()
-        return Task.objects.select_related('category').filter(user=self.request.user)
-
+        queryset = Task.objects.all()
+        user = self.request.user
+        if user.is_authenticated:
+            queryset = queryset.filter(user=user)
+        return queryset
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
