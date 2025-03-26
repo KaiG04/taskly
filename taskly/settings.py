@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'rest_framework',
     'djoser',
+    'django_filters',
     'accounts.apps.AccountsConfig',
     'tasks.apps.TasksConfig',
 ]

@@ -8,9 +8,11 @@ from .serializers import TaskSerializer, CategorySerializer
 
 # Create your views here.
 class TaskViewSet(ModelViewSet):
-    queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Task.objects.select_related('category').filter(user=self.request.user)
 
 
     def perform_create(self, serializer):
