@@ -17,8 +17,6 @@ class TaskViewSet(ModelViewSet):
     search_fields = ['title']
     ordering_fields = ['created_at']
 
-
-
     def get_queryset(self):
         queryset = Task.objects.all()
         user = self.request.user
