@@ -114,7 +114,7 @@ class TestCreateTask:
         response = api_client.post('/tasks/', valid_task_data)
         task = Task.objects.get(id=response.data["id"])
         assert response.status_code == status.HTTP_201_CREATED
-        assert task.user == user
+        assert task.created_by == user
 
     def test_if_optional_fields_allow_task_creation_returns_201(self, user, api_client):
         api_client.force_authenticate(user=user)

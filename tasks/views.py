@@ -23,11 +23,11 @@ class TaskViewSet(ModelViewSet):
         queryset = Task.objects.all()
         user = self.request.user
         if user.is_authenticated:
-            queryset = queryset.filter(user=user)
+            queryset = queryset.filter(created_by=user)
         return queryset
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        serializer.save(created_by=self.request.user)
 
 
 

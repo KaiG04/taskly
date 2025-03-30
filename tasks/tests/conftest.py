@@ -22,7 +22,7 @@ def api_client():
 def valid_task_data(user):
     task = baker.prepare(
         "Task",  # Task model
-        user=user # Test user
+        created_by=user # Test user
     )
     data = {
         "title": task.title,
