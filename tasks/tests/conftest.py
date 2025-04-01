@@ -11,7 +11,7 @@ from tasks.models import Category
 @pytest.fixture
 def user():
     User = get_user_model()
-    return User.objects.create_user(username='testuser', password='testpassword')
+    return User.objects.create_user(username='testuser', password='testpassword', email="testuser@example.com")
 
 @pytest.fixture
 def api_client():
