@@ -10,11 +10,13 @@ djangorestframework = "*"
 djoser = "*"
 djangorestframework-simplejwt = "*"
 django-filter = "*"
+drf-nested-routers = "*"
 
 [dev-packages]
 pytest-django = "*"
 django-debug-toolbar = "*"
 model-bakery = "*"
+django-extensions = "*"
 
 [requires]
 python_version = "3.13"
