@@ -46,6 +46,19 @@ class TestGetTask:
         assert response.status_code == status.HTTP_200_OK
         assert user.is_staff
 
+    def test_if_user_can_retrieve_specific_task_returns_200(self, user, api_client):
+        """
+        Test that an authenticated user can access a specific task and receives a 200 response.
+        :param user:
+        :param api_client:
+        """
+        task = baker.make(Task, created_by=user) #passing created_by as is required, and baker doesn't set this
+        api_client.force_authenticate(user=user)
+
+        response = api_client.get(f'/tasks/{task.id}/')
+
+        assert response.status_code == status.HTTP_200_OK
+
 
 
 @pytest.mark.django_db
@@ -168,9 +181,9 @@ class TestUpdateTask:
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_if_user_is_authenticated_returns_200(self, user, api_client):
+    def test_if_user_is_authenticated_can_patch_returns_200(self, user, api_client):
         """
-        Test that an authenticated user can update a task and receives a 200 response.
+        Test that an authenticated user can partially(patch) update a task and receives a 200 response.
         :param user:
         :param api_client:
         """
@@ -178,6 +191,26 @@ class TestUpdateTask:
         task = baker.make(Task, created_by=user)
 
         response = api_client.put(f'/tasks/{task.id}/', data={"title": "Test Update Title"})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["title"] == "Test Update Title"
+
+    def test_if_user_is_authenticated_can_put_returns_200(self, user, api_client):
+        """
+        Test that an authenticated user can fully(put) update a task and receives a 200 response.
+        :param user:
+        :param api_client:
+        """
+        api_client.force_authenticate(user=user)
+        task = baker.make(Task, created_by=user)
+
+        response = api_client.put(f'/tasks/{task.id}/',
+        data={
+            "title": "Test Update Title",
+            "description": "Test Update Description",
+            "deadline": "2025-04-24T00:00:00Z",
+            "priority": "H",
+        })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data["title"] == "Test Update Title"
