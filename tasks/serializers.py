@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 
 from rest_framework import serializers
 
-from .models import TaskCard, Task, Category
+from .models import TaskCard, Task
 from .validators import validate_deadline
 
 
@@ -27,17 +27,15 @@ class TaskCardSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer, DeadlineValidationMixin):
     class Meta:
         model = Task
-        fields = ['id', 'title', 'description', 'created_at', 'created_by', 'category', 'priority', 'deadline']
+        fields = ['id', 'title', 'description', 'created_at', 'created_by', 'priority', 'deadline',
+                  'completed']
         read_only_fields = ['created_by']
 
 
 class TaskUpdateSerializer(serializers.ModelSerializer, DeadlineValidationMixin):
     class Meta:
         model = Task
-        fields = ['title', 'description', 'created_at', 'category', 'priority', 'deadline']
+        fields = ['title', 'description', 'created_at', 'priority', 'deadline', 'completed']
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ['id', 'title', 'description', 'created_by']
+

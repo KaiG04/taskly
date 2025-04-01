@@ -6,7 +6,6 @@ from . import views
 
 router = DefaultRouter()
 router.register('cards', views.TaskCardViewSet, basename='cards')
-router.register('category', views.CategoryViewSet, basename='category')
 
 # URLConf
 urlpatterns = router.urls

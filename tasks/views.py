@@ -5,9 +5,9 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import SAFE_METHODS
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Task, Category, TaskCard
+from .models import Task, TaskCard
 from .permissions import IsOwnerOrReadOnly
-from .serializers import TaskSerializer, CategorySerializer, TaskUpdateSerializer, TaskCardSerializer
+from .serializers import TaskSerializer, TaskUpdateSerializer, TaskCardSerializer
 
 
 # Create your views here.
@@ -23,7 +23,6 @@ class TaskViewSet(ModelViewSet):
     queryset = Task.objects.all()
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['category']
     search_fields = ['title']
     ordering_fields = ['created_at']
     http_method_names = ['get', 'post', 'put', 'patch', 'delete']
@@ -40,7 +39,3 @@ class TaskViewSet(ModelViewSet):
         serializer.save(created_by=self.request.user)
 
 
-
-class CategoryViewSet(ModelViewSet):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer

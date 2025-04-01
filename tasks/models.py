@@ -27,17 +27,7 @@ class TaskCard(models.Model):
         super().save(*args, **kwargs)
 
 
-
-class Category(models.Model):
-    title = models.CharField(max_length=255)
-    description = models.TextField(null=True, blank=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.title
-
 class Task(models.Model):
-
     PRIORITY_NONE = 'N'
     PRIORITY_LOW = 'L'
     PRIORITY_MEDIUM = 'M'
@@ -52,10 +42,10 @@ class Task(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    category = models.ForeignKey(Category, on_delete=models.PROTECT, null=True, blank=True)
     deadline = models.DateTimeField(validators=[validate_deadline], null=True, blank=True)
     priority = models.CharField(max_length=1, choices=PRIORITY_CHOICES, default=PRIORITY_NONE)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    completed = models.BooleanField(default=False)
     task_card = models.ForeignKey(TaskCard, on_delete=models.CASCADE, related_name='tasks')
 
     def __str__(self):

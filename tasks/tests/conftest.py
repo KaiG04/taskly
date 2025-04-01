@@ -1,11 +1,9 @@
-from unicodedata import category
 
 import pytest
 from django.contrib.auth import get_user_model
 from model_bakery import baker
 from rest_framework.test import APIClient
 
-from tasks.models import Category
 
 
 @pytest.fixture
@@ -28,8 +26,6 @@ def valid_task_data(user):
         "title": task.title,
         "priority": task.priority,
     }
-    if task.category:
-        data["category"] = task.category.id
     if task.deadline:
         data["deadline"] = task.deadline.isoformat()
     if task.description:
