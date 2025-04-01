@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils.text import slugify
 
 import secrets
 
@@ -38,8 +39,8 @@ class Task(models.Model):
         (PRIORITY_MEDIUM, 'Medium priority'),
         (PRIORITY_HIGH, 'High priority'),
     ]
-
     title = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255, unique=True)
     description = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     deadline = models.DateTimeField(validators=[validate_deadline], null=True, blank=True)
@@ -47,6 +48,18 @@ class Task(models.Model):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     completed = models.BooleanField(default=False)
     task_card = models.ForeignKey(TaskCard, on_delete=models.CASCADE, related_name='tasks')
+
+    def save(self, *args, **kwargs):
+        if not self.slug or self.title_changed(): # if slug is None, or if title has changed update slug
+            self.slug = slugify(f"{self.pk}-{self.title}")
+        super().save(*args, **kwargs)
+
+    def title_changed(self):
+        """Check if the title has changed."""
+        if self.pk:
+            old_title = Task.objects.get(pk=self.pk).title
+            return old_title != self.title
+        return False
 
     def __str__(self):
         return self.title
