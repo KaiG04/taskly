@@ -5,7 +5,7 @@ from rest_framework.routers import DefaultRouter
 from . import views
 
 router = DefaultRouter()
-router.register('tasks', views.TaskViewSet, basename='tasks') # task-list, #task-detail
+router.register('cards', views.TaskCardViewSet, basename='cards')
 router.register('category', views.CategoryViewSet, basename='category')
 
 # URLConf

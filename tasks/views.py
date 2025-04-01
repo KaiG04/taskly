@@ -5,12 +5,20 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import SAFE_METHODS
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Task, Category
+from .models import Task, Category, TaskCard
 from .permissions import IsOwnerOrReadOnly
-from .serializers import TaskSerializer, CategorySerializer, TaskUpdateSerializer
+from .serializers import TaskSerializer, CategorySerializer, TaskUpdateSerializer, TaskCardSerializer
 
 
 # Create your views here.
+class TaskCardViewSet(ModelViewSet):
+    queryset = TaskCard.objects.all()
+    serializer_class = TaskCardSerializer
+    lookup_field = 'slug'
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
 class TaskViewSet(ModelViewSet):
     queryset = Task.objects.all()
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]

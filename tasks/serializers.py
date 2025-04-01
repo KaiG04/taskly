@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 
 from rest_framework import serializers
 
-from .models import Task, Category
+from .models import TaskCard, Task, Category
 from .validators import validate_deadline
 
 
@@ -15,6 +15,13 @@ class DeadlineValidationMixin:
         except DjangoValidationError as e:
             raise serializers.ValidationError(e.messages) # Convert Django error to DRF error
         return value
+
+class TaskCardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TaskCard
+        fields = ['id', 'slug', 'title', 'visibility', 'created_at', 'last_updated', 'owner']
+        read_only_fields = ['slug', 'created_at', 'last_updated', 'owner']
+
 
 
 class TaskSerializer(serializers.ModelSerializer, DeadlineValidationMixin):
