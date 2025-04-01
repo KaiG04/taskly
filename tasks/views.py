@@ -6,12 +6,14 @@ from rest_framework.permissions import SAFE_METHODS
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Task, Category
+from .permissions import IsOwnerOrReadOnly
 from .serializers import TaskSerializer, CategorySerializer, TaskUpdateSerializer
 
 
 # Create your views here.
 class TaskViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    queryset = Task.objects.all()
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['category']
     search_fields = ['title']
@@ -25,12 +27,6 @@ class TaskViewSet(ModelViewSet):
         elif self.request.method == 'PUT' or self.request.method == 'PATCH':
             return TaskUpdateSerializer
 
-    def get_queryset(self):
-        queryset = Task.objects.all()
-        user = self.request.user
-        if user.is_authenticated:
-            queryset = queryset.filter(created_by=user)
-        return queryset
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
