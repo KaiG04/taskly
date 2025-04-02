@@ -29,12 +29,10 @@ class TaskCard(models.Model):
 
 
 class Task(models.Model):
-    PRIORITY_NONE = 'N'
     PRIORITY_LOW = 'L'
     PRIORITY_MEDIUM = 'M'
     PRIORITY_HIGH = 'H'
     PRIORITY_CHOICES = [
-        (PRIORITY_NONE, 'No priority'),
         (PRIORITY_LOW, 'Low priority'),
         (PRIORITY_MEDIUM, 'Medium priority'),
         (PRIORITY_HIGH, 'High priority'),
@@ -44,7 +42,7 @@ class Task(models.Model):
     description = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     deadline = models.DateTimeField(validators=[validate_deadline], null=True, blank=True)
-    priority = models.CharField(max_length=1, choices=PRIORITY_CHOICES, default=PRIORITY_NONE)
+    priority = models.CharField(max_length=1, choices=PRIORITY_CHOICES, null=True, blank=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     completed = models.BooleanField(default=False)
     task_card = models.ForeignKey(TaskCard, on_delete=models.CASCADE, related_name='tasks')

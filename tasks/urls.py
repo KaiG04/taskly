@@ -16,4 +16,5 @@ cards_router.register('tasks', TaskViewSet, basename='card-tasks')
 
 
 # URLConf
-urlpatterns = router.urls + cards_router.urls
+urlpatterns = [
+] + router.urls + cards_router.urls

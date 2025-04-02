@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.shortcuts import render
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -7,7 +8,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.utils.text import slugify
 
 from .models import Task, TaskCard
-from .permissions import IsOwnerOrReadOnly
+from .permissions import IsOwnerOrReadOnly, PublicTaskCardPermission
 from .serializers import TaskSerializer, TaskUpdateSerializer, TaskCardSerializer
 
 
@@ -16,10 +17,11 @@ class TaskCardViewSet(ModelViewSet):
     queryset = TaskCard.objects.all()
     serializer_class = TaskCardSerializer
     lookup_field = "slug"
-
+    permission_classes = [PublicTaskCardPermission]
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
 
 class TaskViewSet(ModelViewSet):
     queryset = Task.objects.all()
@@ -29,6 +31,7 @@ class TaskViewSet(ModelViewSet):
     search_fields = ['title']
     ordering_fields = ['created_at']
     http_method_names = ['get', 'post', 'put', 'patch', 'delete']
+
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS or self.request.method == 'POST':
