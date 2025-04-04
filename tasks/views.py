@@ -7,17 +7,16 @@ from rest_framework.permissions import SAFE_METHODS
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils.text import slugify
 
-from .models import Task, TaskCard
-from .permissions import IsOwnerOrReadOnly, PublicTaskCardPermission
-from .serializers import TaskSerializer, TaskUpdateSerializer, TaskCardSerializer
+from .models import Task, TaskBoard
+from .permissions import IsOwnerOrReadOnly
+from .serializers import TaskSerializer, TaskUpdateSerializer, TaskBoardSerializer
 
 
 # Create your views here.
-class TaskCardViewSet(ModelViewSet):
-    queryset = TaskCard.objects.all()
-    serializer_class = TaskCardSerializer
+class TaskBoardViewSet(ModelViewSet):
+    queryset = TaskBoard.objects.all()
+    serializer_class = TaskBoardSerializer
     lookup_field = "slug"
-    permission_classes = [PublicTaskCardPermission]
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -42,7 +41,8 @@ class TaskViewSet(ModelViewSet):
 
 
     def perform_create(self, serializer):
-        task_card = TaskCard.objects.get(slug=self.kwargs['card_slug'])
+
+        task_card = TaskBoard.objects.get(slug=self.kwargs['card_slug'])
         task = serializer.save(created_by=self.request.user, task_card=task_card)
 
         task.slug = slugify(f"{task.id}-{task.title}")

@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 
 from rest_framework import serializers
 
-from .models import TaskCard, Task
+from .models import TaskBoard, Task
 from .validators import validate_deadline
 
 
@@ -27,12 +27,12 @@ class TaskSerializer(serializers.ModelSerializer, DeadlineValidationMixin):
         read_only_fields = ['created_by', 'slug']
 
 
-class TaskCardSerializer(serializers.ModelSerializer):
+class TaskBoardSerializer(serializers.ModelSerializer):
     tasks = TaskSerializer(many=True, read_only=True)
 
 
     class Meta:
-        model = TaskCard
+        model = TaskBoard
         fields = ['id', 'slug', 'title', 'visibility', 'created_at', 'last_updated', 'owner', 'tasks']
         read_only_fields = ['slug', 'created_at', 'last_updated', 'owner']
 

@@ -8,7 +8,7 @@ from tasks.validators import validate_deadline
 
 
 # Create your models here.
-class TaskCard(models.Model):
+class TaskBoard(models.Model):
     VISIBILITY_PUBLIC = 'PUB'
     VISIBILITY_PRIVATE = 'PRI'
     VISIBILITY_CHOICES = [
@@ -45,7 +45,7 @@ class Task(models.Model):
     priority = models.CharField(max_length=1, choices=PRIORITY_CHOICES, null=True, blank=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     completed = models.BooleanField(default=False)
-    task_card = models.ForeignKey(TaskCard, on_delete=models.CASCADE, related_name='tasks')
+    task_board = models.ForeignKey(TaskBoard, on_delete=models.CASCADE, related_name='tasks')
 
     def save(self, *args, **kwargs):
         if not self.slug or self.title_changed(): # if slug is None, or if title has changed update slug
