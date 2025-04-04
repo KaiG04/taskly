@@ -1,11 +1,12 @@
-from django.contrib.auth import get_user_model
-from django.shortcuts import render
+from django.http import HttpResponseRedirect
 from rest_framework.filters import SearchFilter, OrderingFilter
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import SAFE_METHODS
+
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils.text import slugify
+from django.shortcuts import redirect
 
 from .models import Task, TaskBoard
 from .permissions import IsOwnerOrReadOnly
@@ -14,12 +15,30 @@ from .serializers import TaskSerializer, TaskUpdateSerializer, TaskBoardSerializ
 
 # Create your views here.
 class TaskBoardViewSet(ModelViewSet):
-    queryset = TaskBoard.objects.all()
     serializer_class = TaskBoardSerializer
     lookup_field = "slug"
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        print(self.request.user.id)
+        return TaskBoard.objects.filter(owner=self.request.user.id)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+    def list(self, request, *args, **kwargs):
+        # Django calls list method after getting the get request. Completes this and continues with original method.
+        """
+        Override the list method to ensure proper redirection if the username doesn't match.
+        """
+        url_username = self.kwargs.get('username')
+
+        # If the URL username doesn't match the logged-in user, redirect to their own boards
+        if request.user.username != url_username:
+            return redirect(f"/{request.user.username}/boards")  # Redirect to correct user's boards
+
+        # Call the original list method to return the task boards
+        return super().list(request, *args, **kwargs)
 
 
 class TaskViewSet(ModelViewSet):
@@ -37,7 +56,6 @@ class TaskViewSet(ModelViewSet):
             return TaskSerializer
         elif self.request.method == 'PUT' or self.request.method == 'PATCH':
             return TaskUpdateSerializer
-
 
 
     def perform_create(self, serializer):
