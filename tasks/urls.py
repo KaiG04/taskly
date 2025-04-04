@@ -6,15 +6,13 @@ from .views import TaskBoardViewSet, TaskViewSet
 from rest_framework.routers import DefaultRouter
 from rest_framework_nested import routers
 
-from . import views
-
 router = DefaultRouter()
-router.register(r'cards', TaskBoardViewSet, basename='cards') #cards-list, cards-detail
+router.register('boards', TaskBoardViewSet, basename='taskboards')
 
-cards_router = routers.NestedDefaultRouter(router, r'cards', lookup='card')
-cards_router.register('tasks', TaskViewSet, basename='card-tasks')
+tasks_router = routers.NestedSimpleRouter(router, r'boards', lookup='board')
+tasks_router.register('tasks', TaskViewSet, basename='tasks')
 
-
-# URLConf
 urlpatterns = [
-] + router.urls + cards_router.urls
+    path('<str:username>/', include(router.urls)),
+] + tasks_router.urls
+
