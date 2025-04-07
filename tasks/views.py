@@ -63,11 +63,6 @@ class TaskViewSet(ModelViewSet):
 
 
     def perform_create(self, serializer):
-
         task_board = TaskBoard.objects.get(slug=self.kwargs['board_slug'])
         task = serializer.save(created_by=self.request.user, task_board=task_board)
-
-        task.slug = slugify(f"{task.id}-{task.title}")
         task.save()
-
-

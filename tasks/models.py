@@ -39,6 +39,7 @@ class Task(models.Model):
     ]
     title = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True)
+    local_id = models.PositiveIntegerField()
     description = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     deadline = models.DateTimeField(validators=[validate_deadline], null=True, blank=True)
@@ -47,10 +48,20 @@ class Task(models.Model):
     completed = models.BooleanField(default=False)
     task_board = models.ForeignKey(TaskBoard, on_delete=models.CASCADE, related_name='tasks')
 
+    class Meta:
+        unique_together = ('task_board', 'local_id')  # Ensures no duplicates per board
+
     def save(self, *args, **kwargs):
+        if not self.pk:
+            # Only set local_id on creation
+            max_local_id = Task.objects.filter(task_board=self.task_board
+                                               ).aggregate(models.Max('local_id'))['local_id__max']
+            self.local_id = (max_local_id or 0) + 1
+
         if not self.slug or self.title_changed(): # if slug is None, or if title has changed update slug
-            self.slug = slugify(f"{self.pk}-{self.title}")
+            self.slug = slugify(f"{self.local_id}-{self.title}")
         super().save(*args, **kwargs)
+
 
     def title_changed(self):
         """Check if the title has changed."""
