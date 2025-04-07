@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError as DjangoValidationError
 
 from rest_framework import serializers
@@ -19,12 +18,14 @@ class DeadlineValidationMixin:
             raise serializers.ValidationError(e.messages) # Convert Django error to DRF error
         return value
 
+
 class TaskSerializer(serializers.ModelSerializer, DeadlineValidationMixin):
     class Meta:
         model = Task
-        fields = ['slug', 'title', 'description', 'created_at', 'created_by', 'priority', 'deadline',
-                  'completed']
-        read_only_fields = ['created_by', 'slug']
+        fields = ['title', 'slug', 'description', 'created_at','deadline', 'priority', 'created_by', 'completed',
+                  'task_board']
+        read_only_fields = ['created_by', 'slug', 'task_board']
+
 
 
 class TaskBoardSerializer(serializers.ModelSerializer):

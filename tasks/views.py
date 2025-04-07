@@ -20,7 +20,6 @@ class TaskBoardViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        print(self.request.user.id)
         return TaskBoard.objects.filter(owner=self.request.user.id)
 
     def perform_create(self, serializer):
@@ -42,13 +41,18 @@ class TaskBoardViewSet(ModelViewSet):
 
 
 class TaskViewSet(ModelViewSet):
-    queryset = Task.objects.all()
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     lookup_field = 'slug'
     search_fields = ['title']
     ordering_fields = ['created_at']
     http_method_names = ['get', 'post', 'put', 'patch', 'delete']
+
+    def get_queryset(self):
+        board_slug = self.kwargs.get('board_slug')
+        if board_slug:
+            return Task.objects.filter(task_board__slug=board_slug, created_by=self.request.user)
+        return Task.objects.none()
 
 
     def get_serializer_class(self):
@@ -60,8 +64,8 @@ class TaskViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
 
-        task_card = TaskBoard.objects.get(slug=self.kwargs['card_slug'])
-        task = serializer.save(created_by=self.request.user, task_card=task_card)
+        task_board = TaskBoard.objects.get(slug=self.kwargs['board_slug'])
+        task = serializer.save(created_by=self.request.user, task_board=task_board)
 
         task.slug = slugify(f"{task.id}-{task.title}")
         task.save()
