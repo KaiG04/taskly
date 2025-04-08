@@ -1,23 +1,22 @@
-from django.http import HttpResponseRedirect
-from rest_framework.filters import SearchFilter, OrderingFilter
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import SAFE_METHODS
-
+from django.http import Http404
+from django.shortcuts import redirect, get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from django.utils.text import slugify
-from django.shortcuts import redirect
+from rest_framework import status
+
+from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.viewsets import ModelViewSet
+
+
 
 from .models import Task, TaskBoard
 from .permissions import IsOwnerOrReadOnly
-from .serializers import TaskSerializer, TaskUpdateSerializer, TaskBoardSerializer
+from .serializers import TaskSerializer, TaskBoardSerializer
 
 
 # Create your views here.
 class TaskBoardViewSet(ModelViewSet):
     serializer_class = TaskBoardSerializer
     lookup_field = "slug"
-    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return TaskBoard.objects.filter(owner=self.request.user.id)
@@ -41,25 +40,17 @@ class TaskBoardViewSet(ModelViewSet):
 
 
 class TaskViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [IsOwnerOrReadOnly]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     lookup_field = 'slug'
     search_fields = ['title']
     ordering_fields = ['created_at']
-    http_method_names = ['get', 'post', 'put', 'patch', 'delete']
+    serializer_class = TaskSerializer
 
     def get_queryset(self):
         board_slug = self.kwargs.get('board_slug')
-        if board_slug:
-            return Task.objects.filter(task_board__slug=board_slug, created_by=self.request.user)
-        return Task.objects.none()
-
-
-    def get_serializer_class(self):
-        if self.request.method in SAFE_METHODS or self.request.method == 'POST':
-            return TaskSerializer
-        elif self.request.method == 'PUT' or self.request.method == 'PATCH':
-            return TaskUpdateSerializer
+        board = get_object_or_404(TaskBoard, slug=board_slug)
+        return Task.objects.filter(task_board=board)
 
 
     def perform_create(self, serializer):

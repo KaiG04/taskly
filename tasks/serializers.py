@@ -31,7 +31,6 @@ class TaskSerializer(serializers.ModelSerializer, DeadlineValidationMixin):
 class TaskBoardSerializer(serializers.ModelSerializer):
     tasks = TaskSerializer(many=True, read_only=True)
 
-
     class Meta:
         model = TaskBoard
         fields = ['id', 'slug', 'title', 'visibility', 'created_at', 'last_updated', 'owner', 'tasks']
@@ -40,10 +39,10 @@ class TaskBoardSerializer(serializers.ModelSerializer):
 
 
 
-class TaskUpdateSerializer(serializers.ModelSerializer, DeadlineValidationMixin):
-    class Meta:
-        model = Task
-        fields = ['title', 'description', 'created_at', 'priority', 'deadline', 'completed']
+# class TaskUpdateSerializer(serializers.ModelSerializer, DeadlineValidationMixin):
+#     class Meta:
+#         model = Task
+#         fields = ['title', 'description', 'created_at', 'priority', 'deadline', 'completed']
 
 
 
