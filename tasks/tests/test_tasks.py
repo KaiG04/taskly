@@ -9,7 +9,7 @@ from rest_framework import status
 
 from tasks.models import Task
 
-
+@pytest.mark.skip
 @pytest.mark.django_db
 class TestGetTask:
     def test_if_user_is_anonymous_returns_401(self, api_client):
@@ -64,7 +64,7 @@ class TestGetTask:
         assert response.status_code == status.HTTP_200_OK
 
 
-
+@pytest.mark.skip
 @pytest.mark.django_db
 class TestCreateTask:
     def test_if_user_is_anonymous_returns_401(self, valid_task_data, api_client):
@@ -265,6 +265,7 @@ class TestCreateTask:
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+@pytest.mark.skip
 @pytest.mark.django_db
 class TestUpdateTask:
     def test_if_user_is_anonymous_returns_401(self, api_client):

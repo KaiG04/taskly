@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from model_bakery import baker
 from rest_framework.test import APIClient
 
+from tasks.models import TaskBoard
 
 
 @pytest.fixture
@@ -30,4 +31,17 @@ def valid_task_data(user):
         data["deadline"] = task.deadline.isoformat()
     if task.description:
         data["description"] = task.description
+    return data
+
+@pytest.fixture
+def valid_board_data(user):
+    task_board = baker.make(
+        "TaskBoard",  # Task model
+        owner=user,
+    )
+    data = {
+        "title": task_board.title,
+        "slug": task_board.slug,
+        "owner": task_board.owner.username,
+    }
     return data
