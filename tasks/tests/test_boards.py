@@ -94,6 +94,25 @@ class TestGetTaskBoards:
             assert response.status_code == status.HTTP_302_FOUND
             assert response.url == f'/{valid_board_data["owner"]}/boards/{valid_board_data["slug"]}/'
 
+        def test_if_user_provides_invalid_task_board_slug_returns_404(self, user, api_client, valid_board_data):
+            """
+            Test that if the user provides a slug for a board that does not exist, it will return 404.
+            :param user:
+            :param api_client:
+            :param valid_board_data:
+            """
+            api_client.force_authenticate(user=user)
+            api_client.post(f'/{valid_board_data["owner"]}/boards/', data=valid_board_data)
+            invalid_slug = 'smiler'
+
+            response = api_client.get(f'/{valid_board_data["owner"]}/boards/{invalid_slug}/')
+
+            assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+
+
+
 
 
 
