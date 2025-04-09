@@ -40,6 +40,18 @@ class TaskBoardViewSet(ModelViewSet):
         # Call the original list method to return the task boards
         return super().list(request, *args, **kwargs)
 
+    def retrieve(self, request, *args, **kwargs):
+        """
+        Override the retrieve method to ensure proper redirection if the username doesn't match.'
+        """
+        url_username = self.kwargs.get('username')
+        slug = self.kwargs.get('slug')
+
+        if request.user.username != url_username:
+            return redirect(f"/{request.user.username}/boards/{slug}")
+
+        return super().retrieve(request, *args, **kwargs)
+
 
 class TaskViewSet(ModelViewSet):
     permission_classes = [IsOwnerOrReadOnly]
