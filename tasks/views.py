@@ -10,7 +10,7 @@ from rest_framework.viewsets import ModelViewSet
 
 
 from .models import Task, TaskBoard
-from .permissions import IsOwnerOrReadOnly
+from .permissions import IsOwnerOrReadOnly, TaskBoardVisibility
 from .serializers import TaskSerializer, TaskBoardSerializer
 
 
@@ -35,7 +35,7 @@ class TaskBoardViewSet(ModelViewSet):
 
         # If the URL username doesn't match the logged-in user, redirect to their own boards
         if request.user.username != url_username:
-            return redirect(f"/{request.user.username}/boards")  # Redirect to correct user's boards
+            return redirect(f"/{request.user.username}/boards/")  # Redirect to correct user's boards
 
         # Call the original list method to return the task boards
         return super().list(request, *args, **kwargs)
@@ -48,7 +48,7 @@ class TaskBoardViewSet(ModelViewSet):
         slug = self.kwargs.get('slug')
 
         if request.user.username != url_username:
-            return redirect(f"/{request.user.username}/boards/{slug}")
+            return redirect(f"/{request.user.username}/boards/{slug}/")
 
         return super().retrieve(request, *args, **kwargs)
 
