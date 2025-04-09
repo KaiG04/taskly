@@ -20,6 +20,21 @@ class IsOwnerOrReadOnly(BasePermission):
         if request.method in SAFE_METHODS and request.user.is_authenticated: return True
         return bool(obj.task_board.owner == request.user)
 
+class TaskBoardVisibility(BasePermission):
+    def has_permission(self, request, view):
+        board_slug = view.kwargs.get('board_slug')
+        board = TaskBoard.objects.get(slug=board_slug)
+        if board.visibility == "PRI":
+            if request.user == board.owner:
+                return True
+            return False
+        if board.visibility == "PUB":
+            return True
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in SAFE_METHODS and request.user.is_authenticated: return True
+        return bool(obj.task_board.owner == request.user)
+
 
 
 

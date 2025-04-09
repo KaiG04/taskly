@@ -8,7 +8,6 @@ from tasks.models import TaskBoard
 
 @pytest.mark.django_db
 class TestGetTaskBoards:
-
     class TestGetTaskBoardList:
         def test_if_user_is_anonymous_return_401(self, user, api_client):
             """
@@ -45,6 +44,7 @@ class TestGetTaskBoards:
             response = api_client.get(f'/{target_username}/boards/')
 
             assert response.status_code == status.HTTP_302_FOUND
+            assert response.url == f'/{user.username}/boards/'
 
     class TestGetTaskBoardInstance:
         def test_if_user_is_anonymous_cannot_retrieve_task_board_instance_returns_401(self
@@ -75,5 +75,25 @@ class TestGetTaskBoards:
             response = api_client.get(f'/{valid_board_data["owner"]}/boards/{valid_board_data["slug"]}/')
 
             assert response.status_code == status.HTTP_200_OK
+
+        def test_if_user_is_authenticated_and_if_changes_url_gets_redirected_returns_302(
+                self, user, api_client, valid_board_data):
+            """
+            Test that a user is authenticated in order to access the task board instance. If the user tries to
+            manipulate the url by changing the username. It will auto-redirect the user back to their username
+            :param user:
+            :param api_client:
+            :param valid_board_data:
+            """
+            api_client.force_authenticate(user=user)
+            api_client.post(f'/{valid_board_data["owner"]}/boards/', data=valid_board_data)
+            changed_username = 'bob'
+
+            response = api_client.get(f'/{changed_username}/boards/{valid_board_data["slug"]}/')
+
+            assert response.status_code == status.HTTP_302_FOUND
+            assert response.url == f'/{valid_board_data["owner"]}/boards/{valid_board_data["slug"]}/'
+
+
 
 

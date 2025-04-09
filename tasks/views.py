@@ -54,7 +54,7 @@ class TaskBoardViewSet(ModelViewSet):
 
 
 class TaskViewSet(ModelViewSet):
-    permission_classes = [IsOwnerOrReadOnly]
+    permission_classes = [IsOwnerOrReadOnly, TaskBoardVisibility]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     lookup_field = 'slug'
     search_fields = ['title']
@@ -65,6 +65,7 @@ class TaskViewSet(ModelViewSet):
         board_slug = self.kwargs.get('board_slug')
         board = get_object_or_404(TaskBoard, slug=board_slug)
         return Task.objects.filter(task_board=board)
+
 
 
     def perform_create(self, serializer):
