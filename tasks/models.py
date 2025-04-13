@@ -1,3 +1,4 @@
+from django.core.validators import MaxValueValidator
 from django.db import models
 from django.conf import settings
 from django.utils.text import slugify
@@ -37,9 +38,12 @@ class Task(models.Model):
         (PRIORITY_MEDIUM, 'Medium priority'),
         (PRIORITY_HIGH, 'High priority'),
     ]
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=245)
+    # Set max_length lower that slug due to having slug at 255 so if title was 255 characters, the slug, that is
+    # local_id + title, would be > that 255 causing error.
     slug = models.SlugField(max_length=255, unique=True)
-    local_id = models.PositiveIntegerField()
+    local_id = models.PositiveIntegerField(MaxValueValidator(999999))
+    # Max value to abide with slug max_length
     description = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     deadline = models.DateTimeField(validators=[validate_deadline], null=True, blank=True)
