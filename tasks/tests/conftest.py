@@ -22,12 +22,15 @@ def api_client():
 def valid_task_data(user):
     task = baker.prepare(
         "Task",  # Task model
-        created_by=user # Test user
+        created_by=user, # Test user
     )
     data = {
         "title": task.title,
-        "priority": task.priority,
+        "slug": task.slug,
+        'local_id': task.local_id,
     }
+    if task.priority:
+        data["priority"] = task.priority
     if task.deadline:
         data["deadline"] = task.deadline.isoformat()
     if task.description:
@@ -38,7 +41,7 @@ def valid_task_data(user):
 def valid_board_data(user):
     task_board = baker.make(
         "TaskBoard",  # Task model
-        owner=user,
+        owner=user
     )
     data = {
         "title": task_board.title,
@@ -49,3 +52,8 @@ def valid_board_data(user):
     if task_board.created_at:
         data["created_at"] = task_board.created_at.isoformat()
     return data
+
+@pytest.fixture
+def board_slug(valid_board_data):
+    return valid_board_data["slug"]
+
