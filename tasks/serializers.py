@@ -35,7 +35,8 @@ class TaskBoardSerializer(serializers.ModelSerializer):
     class Meta:
         model = TaskBoard
         fields = ['id', 'slug', 'title', 'visibility', 'created_at', 'last_updated', 'owner', 'tasks']
-        read_only_fields = ['slug', 'created_at', 'last_updated', 'owner']
+        read_only_fields = ['id', 'slug', 'created_at', 'last_updated', 'owner', 'tasks']
+
 
 
 

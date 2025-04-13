@@ -1,6 +1,7 @@
 
 import pytest
 from django.contrib.auth import get_user_model
+from django.utils.timezone import now
 from model_bakery import baker
 from rest_framework.test import APIClient
 
@@ -42,6 +43,9 @@ def valid_board_data(user):
     data = {
         "title": task_board.title,
         "slug": task_board.slug,
+        "visibility": task_board.visibility,
         "owner": task_board.owner.username,
     }
+    if task_board.created_at:
+        data["created_at"] = task_board.created_at.isoformat()
     return data
