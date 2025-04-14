@@ -4,4 +4,5 @@ from . import models
 # Register your models here.
 @admin.register(models.User)
 class UserAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['username', 'email', 'is_staff']
+    search_fields = ['email', 'username']
