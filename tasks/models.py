@@ -28,6 +28,9 @@ class TaskBoard(models.Model):
             self.slug = secrets.token_urlsafe(8)
         super().save(*args, **kwargs)
 
+    def __str__(self):
+        return self.title
+
 
 class Task(models.Model):
     PRIORITY_LOW = 'L'
@@ -42,7 +45,7 @@ class Task(models.Model):
     # Set max_length lower that slug due to having slug at 255 so if title was 255 characters, the slug, that is
     # local_id + title, would be > that 255 causing error.
     slug = models.SlugField(max_length=255, unique=True)
-    local_id = models.PositiveIntegerField(MaxValueValidator(999999))
+    local_id = models.PositiveSmallIntegerField()
     # Max value to abide with slug max_length
     description = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
