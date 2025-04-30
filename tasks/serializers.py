@@ -24,8 +24,8 @@ class TaskSerializer(serializers.ModelSerializer, DeadlineValidationMixin):
     class Meta:
         model = Task
         fields = ['id', 'title', 'slug', 'local_id', 'description', 'created_at','deadline', 'priority', 'created_by',
-                  'completed','task_board', 'task_board_visibility']
-        read_only_fields = ['id', 'created_by', 'slug', 'task_board', 'local_id']
+                  'completed','task_board', 'task_board_visibility', 'reminder_notification']
+        read_only_fields = ['id', 'created_by', 'slug', 'task_board', 'local_id', 'reminder_notification']
 
 
 

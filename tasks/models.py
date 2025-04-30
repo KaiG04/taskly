@@ -54,6 +54,7 @@ class Task(models.Model):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     completed = models.BooleanField(default=False)
     task_board = models.ForeignKey(TaskBoard, on_delete=models.CASCADE, related_name='tasks')
+    reminder_notification = models.BooleanField(default=False) # If deadline < 24 hours user notified.
 
     class Meta:
         unique_together = ('task_board', 'local_id')  # Ensures no duplicates per board
