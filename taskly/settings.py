@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 from datetime import timedelta
 from pathlib import Path
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     'django_filters',
     'accounts.apps.AccountsConfig',
     'tasks.apps.TasksConfig',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -119,9 +121,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
-
 USE_I18N = True
+
+TIME_ZONE = 'Europe/London'
 
 USE_TZ = True
 
@@ -138,6 +140,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'accounts.User'
 
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -152,4 +155,21 @@ SIMPLE_JWT = {
 
 DJOSER = {
     'USER_CREATE_PASSWORD_RETYPE': True,
+}
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 2525
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = False
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+# DEFAULT_FROM_EMAIL = 'from@taskly.com'
+
+CELERY_BROKER_URL = 'redis://localhost:6379/1'
+CELERY_BEAT_SCHEDULE = {
+    'notify_user_task_is_due_within_24_hours': {
+        'task': 'tasks.tasks.notify_user_task_is_due_within_24_hours',
+        'schedule': 5,
+    }
 }
