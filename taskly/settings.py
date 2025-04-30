@@ -170,6 +170,6 @@ CELERY_BROKER_URL = 'redis://localhost:6379/1'
 CELERY_BEAT_SCHEDULE = {
     'notify_user_task_is_due_within_24_hours': {
         'task': 'tasks.tasks.notify_user_task_is_due_within_24_hours',
-        'schedule': 5,
+        'schedule': crontab(minute=0),
     }
 }

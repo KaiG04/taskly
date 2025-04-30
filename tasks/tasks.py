@@ -12,14 +12,12 @@ def notify_user_task_is_due_within_24_hours():
                                 reminder_notification=False, completed=False)
     for task in tasks:
         try:
-            print(f"Preparing to send email for task: {task.title}")
             send_mail(
                 subject='Task Due Reminder',
-                message=f"Hello {task.created_by.username}! Reminder, your task {task.title} is due within 24 hours.",
+                message=f'Hello {task.created_by.username}! Reminder, your task "{task.title}" is due within 24 hours.',
                 from_email='reminder@taskly.com',
                 recipient_list=[task.created_by.email]
             )
-            print(f"Email sent for task: {task.title}")
             task.reminder_notification=True
             task.save()
         except Exception as e:

@@ -1,9 +1,13 @@
+from datetime import timedelta
+
 from django.core.validators import MaxValueValidator
 from django.db import models
 from django.conf import settings
 from django.utils.text import slugify
 
 import secrets
+
+from django.utils.timezone import now
 
 from tasks.validators import validate_deadline
 
@@ -68,6 +72,8 @@ class Task(models.Model):
 
         if not self.slug or self.title_changed(): # if slug is None, or if title has changed update slug
             self.slug = slugify(f"{self.local_id}-{self.title}")
+        if self.pk and self.deadline and self.deadline > (now() + timedelta(hours=24)):
+            self.reminder_notification = False
         super().save(*args, **kwargs)
 
 
