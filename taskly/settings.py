@@ -164,7 +164,7 @@ EMAIL_USE_TLS = False
 EMAIL_USE_SSL = False
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
-# DEFAULT_FROM_EMAIL = 'from@taskly.com'
+DEFAULT_FROM_EMAIL = 'from@taskly.com'
 
 CELERY_BROKER_URL = 'redis://localhost:6379/1'
 CELERY_BEAT_SCHEDULE = {

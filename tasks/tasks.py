@@ -7,7 +7,6 @@ from .models import Task
 
 @shared_task
 def notify_user_task_is_due_within_24_hours():
-    print(f"Testing")
     tasks = Task.objects.filter(deadline__lte=now() + timedelta(hours=24), deadline__gt=now(),
                                 reminder_notification=False, completed=False)
     for task in tasks:
@@ -22,5 +21,7 @@ def notify_user_task_is_due_within_24_hours():
             task.save()
         except Exception as e:
             print("Failed to send email for task: {task.title}. Error: {e}")
+
+
 
 

@@ -1,3 +1,4 @@
+from datetime import timedelta
 
 import pytest
 from django.contrib.auth import get_user_model
@@ -5,7 +6,9 @@ from django.utils.timezone import now
 from model_bakery import baker
 from rest_framework.test import APIClient
 
-from tasks.models import TaskBoard
+from celery.contrib.testing.app import setup_default_app
+from celery.contrib.testing.worker import start_worker
+
 
 
 @pytest.fixture
@@ -56,4 +59,29 @@ def valid_board_data(user):
 @pytest.fixture
 def board_slug(valid_board_data):
     return valid_board_data["slug"]
+
+@pytest.fixture
+def created_task_board(user):
+    task_board = baker.make(
+        "TaskBoard",
+        owner=user
+    )
+    return task_board
+
+
+@pytest.fixture
+def create_task(created_task_board):
+    dl = now() + timedelta(hours=23)
+    def _bake_task(reminder_notification=False, completed=False, deadline=dl, **kwargs):
+        return baker.make(
+            "Task",
+            created_by=created_task_board.owner,
+            task_board=created_task_board,
+            deadline=deadline,
+            reminder_notification=reminder_notification,
+            completed=completed,
+            **kwargs,  # Allows overriding additional fields dynamically
+        )
+    return _bake_task
+
 

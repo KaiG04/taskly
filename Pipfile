@@ -20,6 +20,16 @@ pytest-django = "*"
 django-debug-toolbar = "*"
 model-bakery = "*"
 django-extensions = "*"
+pytest-celery = {extras = ["redis"], version = "*"}
 
 [requires]
 python_version = "3.13"
+
+pytest~=8.3.5
+Django~=5.2
+model-bakery~=1.20.4
+djangorestframework~=3.16.0
+drf-nested-routers~=0.94.1
+celery~=5.5.2
+django-filter~=25.1
+django-debug-toolbar~=5.2.0
