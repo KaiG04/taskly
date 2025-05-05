@@ -35,7 +35,7 @@ Make sure you have the following installed:
 
 ```bash
 # Clone the repo
-git clone https://github.com/your-username/taskly.git
+git clone https://github.com/KaiG04/taskly.git
 cd taskly
 
 # Set up virtual environment
