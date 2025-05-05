@@ -2,7 +2,7 @@ from .common import *
 
 DEBUG = True
 
-SECRET_KEY = 'django-insecure-^j!%!pe-&9*%188@)3a1x2k0zyk*uhd8!nggutjgwl*mp&#)va'
+SECRET_KEY = your-secret-key
 
 DATABASES = {
     'default': {
