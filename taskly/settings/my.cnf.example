@@ -1,0 +1,5 @@
+[client]
+database = taskly
+user = your-user
+password = your-password
+default-character-set = utf8mb4
