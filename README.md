@@ -33,37 +33,62 @@ Make sure you have the following installed:
 
 ### Setup Instructions
 
-```bash
-# Clone the repo
+Clone the repo
+```
 git clone https://github.com/KaiG04/taskly.git
 cd taskly
+```
 
-# Set up virtual environment
+Set up virtual environment
+```
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
-# Install pipenv and dependencies
+Install dependencies with pipenv
+```
 pip install pipenv
+```
+Install the project dependencies:
+```
 pipenv install --dev
+```
+Activate the pipenv shell:
+```
 pipenv shell
-
-# Copy example config files
+```
+Set up configuration files
+Copy example config files
+```
 cp dev.py.example dev.py
 cp my.cnf.example my.cnf
+```
 
-# Run migrations
+Apply database migrations
+
+Make sure your MySQL server is running, then apply the migrations to set up the database schema:
+```
 python manage.py migrate
+```
 
 # Start the Django development server
+```
 python manage.py runserver
+```
 
 # Run Redis using Docker:
+```
 docker run -p 6379:6379 redis
+```
 
 # Start Celery
+```
 celery -A taskly worker --loglevel=info
+```
 
 # Running Tests 
+```
 pytest
+```
 
 
