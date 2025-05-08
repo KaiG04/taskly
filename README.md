@@ -1,5 +1,5 @@
 # Taskly 📝
-
+This is my first django project! Any help / suggestions please send! 
 Taskly is a Django-based task management app that supports user authentication, board and task management, and automated task reminders via Celery.
 
 ## 🚀 Features

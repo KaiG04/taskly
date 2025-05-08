@@ -22,6 +22,17 @@ def notify_user_task_is_due_within_24_hours():
         except Exception as e:
             print("Failed to send email for task: {task.title}. Error: {e}")
 
-
-
-
+@shared_task
+def notify_user_invitation_to_task_board(user, invited_by, task_board):
+    try:
+        print("Sending Invitation to Task Board")
+        send_mail(
+            subject=f"Invitation to {task_board.title}",
+            message=f"{user.username} you have been added as a guest to '{task_board.title}' by {invited_by.username}"
+                    f" you are now able to add, edit and delete tasks.",
+            from_email='invitations@taskly.com',
+            recipient_list=[user.email]
+        )
+        print("Invitation to Task Board Successfully sent")
+    except Exception as e:
+        print(f"Failed to send email for invitation to task. Error: {e}")

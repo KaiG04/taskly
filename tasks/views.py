@@ -1,12 +1,19 @@
+from django.contrib.auth import get_user_model
 from django.shortcuts import redirect, get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import status
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.decorators import action
 
 from .models import Task, TaskBoard
-from .permissions import IsOwnerOrReadOnly, TaskBoardVisibility
+from .permissions import IsOwner, TaskBoardVisibility, IsTaskBoardGuest, IsTaskBoardOwner
 from .serializers import TaskSerializer, TaskBoardSerializer
+
+from .tasks import notify_user_invitation_to_task_board
 
 
 # Create your views here.
@@ -48,8 +55,10 @@ class TaskBoardViewSet(ModelViewSet):
         return super().retrieve(request, *args, **kwargs)
 
 
+
 class TaskViewSet(ModelViewSet):
-    permission_classes = [IsOwnerOrReadOnly, TaskBoardVisibility]
+    #TODO Check TaskBoardVisibility Permission & Write Tests for it
+    permission_classes = [IsOwner, TaskBoardVisibility]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     lookup_field = 'slug'
     search_fields = ['title']
@@ -61,8 +70,27 @@ class TaskViewSet(ModelViewSet):
         board = get_object_or_404(TaskBoard, slug=board_slug)
         return Task.objects.filter(task_board=board)
 
-
     def perform_create(self, serializer):
         task_board = TaskBoard.objects.get(slug=self.kwargs['board_slug'])
         task = serializer.save(created_by=self.request.user, task_board=task_board)
         task.save()
+
+class InviteUserView(APIView):
+    permission_classes = [IsAuthenticated, IsTaskBoardOwner]
+
+    def post(self, request, *args, **kwargs):
+        User = get_user_model()
+        username = request.data.get('username')
+        task_board = get_object_or_404(TaskBoard, slug=self.kwargs['slug'])
+
+        if not username:
+            return Response({"Error: Username Required"}, status=status.HTTP_400_BAD_REQUEST)
+        if username == request.user.username:
+            return Response({"Error: You cannot invite yourself!"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user = User.objects.get(username=username)
+            task_board.guests.add(user)
+            notify_user_invitation_to_task_board(user, request.user, task_board)
+            return Response({"User Successfully Invite"}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"Error: Username Not Found"}, status=status.HTTP_404_NOT_FOUND)
