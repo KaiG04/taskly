@@ -38,13 +38,3 @@ class TaskBoardSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'slug', 'created_at', 'last_updated', 'owner', 'guests', 'tasks']
 
 
-
-
-
-# class TaskUpdateSerializer(serializers.ModelSerializer, DeadlineValidationMixin):
-#     class Meta:
-#         model = Task
-#         fields = ['title', 'description', 'created_at', 'priority', 'deadline', 'completed']
-
-
-

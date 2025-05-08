@@ -7,10 +7,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.decorators import action
 
 from .models import Task, TaskBoard
-from .permissions import IsOwner, TaskBoardVisibility, IsTaskBoardGuest, IsTaskBoardOwner
+from .permissions import TaskBoardAccess, IsTaskBoardOwner
 from .serializers import TaskSerializer, TaskBoardSerializer
 
 from .tasks import notify_user_invitation_to_task_board
@@ -31,7 +30,7 @@ class TaskBoardViewSet(ModelViewSet):
     def list(self, request, *args, **kwargs):
         # Django calls list method after getting the get request. Completes this and continues with original method.
         """
-        Override the list method to ensure proper redirection if the username doesn't match.
+        Override the list method to ensure proper redirection if the request username doesn't match.
         """
         url_username = self.kwargs.get('username')
 
@@ -44,7 +43,7 @@ class TaskBoardViewSet(ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         """
-        Override the retrieve method to ensure proper redirection if the username doesn't match.'
+        Override the retrieve method to ensure proper redirection if the request username doesn't match.
         """
         url_username = self.kwargs.get('username')
         slug = self.kwargs.get('slug')
@@ -58,7 +57,7 @@ class TaskBoardViewSet(ModelViewSet):
 
 class TaskViewSet(ModelViewSet):
     #TODO Check TaskBoardVisibility Permission & Write Tests for it
-    permission_classes = [IsOwner, TaskBoardVisibility]
+    permission_classes = [TaskBoardAccess]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     lookup_field = 'slug'
     search_fields = ['title']

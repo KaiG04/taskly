@@ -27,7 +27,6 @@ class TaskBoard(models.Model):
     last_updated = models.DateTimeField(auto_now=True)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     guests = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name='guests')
-
     def save(self, *args, **kwargs):
         if not self.slug: # Prevents changing URLs on updates
             self.slug = secrets.token_urlsafe(8)

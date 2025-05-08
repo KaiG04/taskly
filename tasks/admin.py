@@ -34,7 +34,7 @@ class TaskInLine(admin.TabularInline):
 
 @admin.register(TaskBoard)
 class TaskBoardAdmin(admin.ModelAdmin):
-    fields = ['id', 'title', 'slug', 'visibility', 'owner', 'created_at', 'last_updated', 'tasks_count']
+    fields = ['id', 'title', 'slug', 'visibility', 'owner', 'created_at', 'last_updated', 'tasks_count', 'guests']
     readonly_fields = ['id', 'slug', 'owner', 'created_at', 'last_updated', 'tasks_count']
     list_display = ['title', 'slug', 'visibility', 'owner', 'tasks_count']
     list_filter = ['created_at', 'last_updated']
