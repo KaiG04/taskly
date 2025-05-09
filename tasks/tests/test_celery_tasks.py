@@ -2,10 +2,13 @@ import pytest
 from datetime import timedelta
 from unittest.mock import patch
 
+from django.contrib.auth import get_user_model
 from django.utils.timezone import now
+from model_bakery import baker
+from rest_framework import status
 
 from tasks.models import Task, TaskBoard
-from tasks.tasks import notify_user_task_is_due_within_24_hours
+from tasks.tasks import notify_user_task_is_due_within_24_hours, notify_user_invitation_to_task_board
 
 
 @pytest.mark.django_db
@@ -103,4 +106,129 @@ def test_no_email_sent_if_task_due_in_more_than_24_hours(
     not_yet_due_task.refresh_from_db()
     assert not not_yet_due_task.reminder_notification
     assert not_yet_due_task.completed is False
+
+@pytest.mark.django_db
+@patch('tasks.tasks.send_mail')
+class TestSendInvitationEmail:
+    def test_send_invitation_email(self, mock_send_mail, api_client, valid_board_data, user, invited_user):
+        """
+        Testing celery task for sending invitation email. Email should be sent and mock_send_mail should only be
+        called once, ensuring only one email is sent to the user.
+        :param mock_send_mail:
+        :param api_client:
+        :param valid_board_data:
+        :param user:
+        :return:
+        """
+        api_client.force_authenticate(user)
+        api_client.post(f'/{user.username}/boards/', data=valid_board_data)
+
+        api_client.post(f"/boards/{valid_board_data['slug']}/invite/", data={
+            'username': invited_user.username
+        })
+
+        mock_send_mail.assert_called_once()
+        args, kwargs = mock_send_mail.call_args
+        assert kwargs['recipient_list'] == [invited_user.email]
+
+    def test_send_invitation_email_doesnt_send_if_not_authorized(
+            self, mock_send_mail, api_client, valid_board_data, user, invited_user):
+        """
+        Test celery task for sending invitation email isn't sent if inviting user is not authorized.
+        :param mock_send_mail:
+        :param api_client:
+        :param valid_board_data:
+        :param user:
+        :param invited_user:
+        :return:
+        """
+        api_client.force_authenticate(user)
+        api_client.post(f'/{user.username}/boards/', data=valid_board_data)
+        api_client.logout()
+
+        api_client.post(f"/boards/{valid_board_data['slug']}/invite/", data={
+            'username': invited_user.username
+        })
+
+        mock_send_mail.assert_not_called()
+
+    def test_send_invitation_email_not_called_if_invalid_invited_user(
+            self, mock_send_mail, api_client, valid_board_data, user, invited_user):
+        """
+        Test celery task for sending invitation email doesn't send if invalid user for invited user.
+        :param mock_send_mail:
+        :param api_client:
+        :param valid_board_data:
+        :param user:
+        :param invited_user:
+        :return:
+        """
+        api_client.force_authenticate(user)
+        api_client.post(f'/{user.username}/boards/', data=valid_board_data)
+
+        api_client.post(f"/boards/{valid_board_data['slug']}/invite/", data={
+            'username': 'usernamedoesnotexist'
+        })
+
+        mock_send_mail.assert_not_called()
+
+    def test_send_invitation_email_doesnt_send_if_board_slug_invalid(
+            self, mock_send_mail, api_client, valid_board_data, user, invited_user):
+        """
+        Test celery task for sending invitation email doesn't send if board slug is invalid.
+        :param mock_send_mail:
+        :param api_client:
+        :param valid_board_data:
+        :param user:
+        :param invited_user:
+        :return:
+        """
+        api_client.force_authenticate(user)
+        api_client.post(f'/{user.username}/boards/', data=valid_board_data)
+
+        api_client.post(f"/boards/slug-doesnt-exist/invite/", data={
+            'username': invited_user.username
+        })
+
+        mock_send_mail.assert_not_called()
+
+    def test_send_invitation_email_does_not_send_if_not_board_owner(
+            self, mock_send_mail, api_client, user, invited_user):
+        """
+        Test celery task for sending invitation email doesn't send if user inviting another is not the board owner.
+        :param mock_send_mail:
+        :param api_client:
+        :param user:
+        :param invited_user:
+        :return:
+        """
+        User = get_user_model()
+        # Creating a new user for board owner
+        owner = User.objects.create_user(username='boardowner', password='imtheowner97', email="boardowner@example.com")
+        task_board = baker.make(
+        "TaskBoard",
+        owner=owner
+        )
+        data = {
+            "title": task_board.title,
+            "slug": task_board.slug,
+            "visibility": task_board.visibility,
+            "owner": task_board.owner.username,
+        } # Creating a new task board
+        api_client.force_authenticate(owner) # authenticating board owner
+        api_client.post(f'/{owner.username}/boards/', data=data) # creating new task board as owner
+
+        api_client.logout()
+        api_client.force_authenticate(user) # authenticating test user - not the board owner
+
+        api_client.post(f"/boards/{data['slug']}/invite/", data={
+            'username': invited_user.username
+        }) # trying to invite user as test user - not the board owner
+
+        mock_send_mail.assert_not_called()
+
+
+
+
+
 

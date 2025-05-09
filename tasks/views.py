@@ -87,11 +87,13 @@ class InviteUserView(APIView):
             return Response({"Error: You cannot invite yourself!"}, status=status.HTTP_400_BAD_REQUEST)
         if task_board.guests.filter(username=username).count(): # if username count > 1 (already in task board guests)
             return Response({"Error: User already invited!"}, status=status.HTTP_400_BAD_REQUEST)
+        if request.user != task_board.owner:
+            return Response({"Error: Only the board owner can send invitations"}, status=status.HTTP_403_FORBIDDEN)
         try:
             user = User.objects.get(username=username)
             task_board.guests.add(user)
             notify_user_invitation_to_task_board(user, request.user, task_board)
-            return Response({"User Successfully Invited"}, status=status.HTTP_200_OK)
+            return Response({"Message: User Successfully Invited"}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({"Error: Username Not Found"}, status=status.HTTP_404_NOT_FOUND)
 
