@@ -7,6 +7,8 @@ Taskly is a Django-based task management app that supports user authentication, 
 - ✅ User registration and login (JWT-based)
 - ✅ Boards and tasks creation
 - ✅ Assign tasks to users
+- ✅ Invite authorized users to your task board
+- ✅ Remove users from your task board
 - ✅ Task reminders via email (Celery + Redis)
 - ✅ REST API using Django REST Framework
 - ✅ Tested with `pytest`
@@ -59,6 +61,9 @@ python manage.py runserver
 
 # Run Redis using Docker:
 docker run -p 6379:6379 redis
+
+#Run smtp4dev using Docker:
+docker run --rm -it -p 3000:80 -p 2525:25 rnwood/smtp4dev
 
 # Start Celery
 celery -A taskly worker --loglevel=info

@@ -110,7 +110,7 @@ def test_no_email_sent_if_task_due_in_more_than_24_hours(
 @pytest.mark.django_db
 @patch('tasks.tasks.send_mail')
 class TestSendInvitationEmail:
-    def test_send_invitation_email(self, mock_send_mail, api_client, valid_board_data, user, invited_user):
+    def test_send_invitation_email(self, mock_send_mail, api_client, valid_board_data, user, action_user):
         """
         Testing celery task for sending invitation email. Email should be sent and mock_send_mail should only be
         called once, ensuring only one email is sent to the user.
@@ -124,15 +124,16 @@ class TestSendInvitationEmail:
         api_client.post(f'/{user.username}/boards/', data=valid_board_data)
 
         api_client.post(f"/boards/{valid_board_data['slug']}/invite/", data={
-            'username': invited_user.username
+            'action': 'invite',
+            'username': action_user.username
         })
 
         mock_send_mail.assert_called_once()
         args, kwargs = mock_send_mail.call_args
-        assert kwargs['recipient_list'] == [invited_user.email]
+        assert kwargs['recipient_list'] == [action_user.email]
 
     def test_send_invitation_email_doesnt_send_if_not_authorized(
-            self, mock_send_mail, api_client, valid_board_data, user, invited_user):
+            self, mock_send_mail, api_client, valid_board_data, user, action_user):
         """
         Test celery task for sending invitation email isn't sent if inviting user is not authorized.
         :param mock_send_mail:
@@ -147,13 +148,14 @@ class TestSendInvitationEmail:
         api_client.logout()
 
         api_client.post(f"/boards/{valid_board_data['slug']}/invite/", data={
-            'username': invited_user.username
+            'action': 'invite',
+            'username': action_user.username
         })
 
         mock_send_mail.assert_not_called()
 
     def test_send_invitation_email_not_called_if_invalid_invited_user(
-            self, mock_send_mail, api_client, valid_board_data, user, invited_user):
+            self, mock_send_mail, api_client, valid_board_data, user, action_user):
         """
         Test celery task for sending invitation email doesn't send if invalid user for invited user.
         :param mock_send_mail:
@@ -167,13 +169,14 @@ class TestSendInvitationEmail:
         api_client.post(f'/{user.username}/boards/', data=valid_board_data)
 
         api_client.post(f"/boards/{valid_board_data['slug']}/invite/", data={
+            'action': 'invite',
             'username': 'usernamedoesnotexist'
         })
 
         mock_send_mail.assert_not_called()
 
     def test_send_invitation_email_doesnt_send_if_board_slug_invalid(
-            self, mock_send_mail, api_client, valid_board_data, user, invited_user):
+            self, mock_send_mail, api_client, valid_board_data, user, action_user):
         """
         Test celery task for sending invitation email doesn't send if board slug is invalid.
         :param mock_send_mail:
@@ -187,13 +190,14 @@ class TestSendInvitationEmail:
         api_client.post(f'/{user.username}/boards/', data=valid_board_data)
 
         api_client.post(f"/boards/slug-doesnt-exist/invite/", data={
-            'username': invited_user.username
+            'action': 'invite',
+            'username': action_user.username
         })
 
         mock_send_mail.assert_not_called()
 
     def test_send_invitation_email_does_not_send_if_not_board_owner(
-            self, mock_send_mail, api_client, user, invited_user):
+            self, mock_send_mail, api_client, user, action_user):
         """
         Test celery task for sending invitation email doesn't send if user inviting another is not the board owner.
         :param mock_send_mail:
@@ -222,7 +226,8 @@ class TestSendInvitationEmail:
         api_client.force_authenticate(user) # authenticating test user - not the board owner
 
         api_client.post(f"/boards/{data['slug']}/invite/", data={
-            'username': invited_user.username
+            'action': 'invite',
+            'username': action_user.username
         }) # trying to invite user as test user - not the board owner
 
         mock_send_mail.assert_not_called()

@@ -19,6 +19,7 @@
   </component>
   <component name="PackageRequirementsSettings">
     <option name="requirementsPath" value="Pipfile" />
+    <option name="versionSpecifier" value="Don't specify version" />
   </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_CONFIGURATION" value="Django" />

@@ -85,9 +85,9 @@ def create_task(created_task_board):
     return _bake_task
 
 @pytest.fixture
-def invited_user():
+def action_user():
     User = get_user_model()
-    return User.objects.create_user(username='inviteduser', password='invitepassword', email="invited-user@example.com")
+    return User.objects.create_user(username='actionuser', password='actionpassword', email="action-user@example.com")
 
 
 
