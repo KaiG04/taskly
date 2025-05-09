@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 from .models import TaskBoard
 
@@ -7,7 +8,7 @@ class TaskBoardAccess(BasePermission):
         if not board_id: # Find out a board exists
             return False
 
-        board = TaskBoard.objects.get(slug=view.kwargs.get('board_slug'))
+        board = get_object_or_404(TaskBoard, slug=board_id)
 
         if request.user == board.owner: return True
         if request.user in board.guests.all(): return True
@@ -25,10 +26,7 @@ class TaskBoardAccess(BasePermission):
 class IsTaskBoardOwner(BasePermission):
     def has_permission(self, request, view):
         board_slug = view.kwargs.get('board_slug')
-        try:
-            board = TaskBoard.objects.get(slug=board_slug)
-        except TaskBoard.DoesNotExist:
-            return False
+        board = get_object_or_404(TaskBoard, slug=board_slug)
 
         if board.owner == request.user:
             return True
