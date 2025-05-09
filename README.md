@@ -83,8 +83,10 @@ python manage.py runserver
 docker run -p 6379:6379 redis
 ```
 
-#Run smtp4dev using Docker:
+# Run smtp4dev using Docker:
+```
 docker run --rm -it -p 3000:80 -p 2525:25 rnwood/smtp4dev
+```
 
 # Start Celery
 ```
